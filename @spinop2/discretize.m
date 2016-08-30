@@ -31,10 +31,6 @@ if ( isempty(names) == 0 )
         eval(sprintf('%s = wrk.(names{k});', names{k}));
     end
 end
- 
-% Create a CHEBOPPREF object with TRIGSPEC discretization:
-pref = cheboppref();
-pref.discretization = @trigspec;
 
 %% Discretize the linear part:
 

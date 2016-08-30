@@ -1,5 +1,5 @@
 function options = plotMovie(S, dt, p, options, t, v, dataGrid, plotGrid)
-%PLOTMOVIE   Plot a movie when solving a PDE specified by a SPINOP2.
+%PLOTMOVIE   Plot a movie when solving a PDE specified by a SPINOPSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.

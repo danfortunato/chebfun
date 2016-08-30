@@ -33,7 +33,7 @@ classdef spinop2 < spinoperator
 %            S.nonlinearPart = @(u) u - (1+1.3i)*u.*(abs(u).^2);
 %            S.init = chebfun2(@(x,y) cos(pi*x/100).*sin(y*pi/100), dom);
 %
-% See also SPINOPERATOR, SPINOP2, SPINOP3, SPIN2.
+% See also SPINOPERATOR, SPIN2.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.

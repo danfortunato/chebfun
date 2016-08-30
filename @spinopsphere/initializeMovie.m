@@ -1,5 +1,6 @@
 function [p, options] = initializeMovie(S, dt, pref, v, dataGrid, plotGrid)
-%INITIALIZEMOVIE   Initialize a movie when solving a PDE specified by a SPINOP2.
+%INITIALIZEMOVIE   Initialize a movie when solving a PDE specified by a 
+%SPINOPSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.

@@ -240,21 +240,21 @@ Nv = S.nonlinearPartVals;
 % Set-up spatial grid, and initial condition (values VINIT and Fourier coeffs 
 % CINIT):
 xx = trigpts(N, dom(1:2));
-if ( dim == 2 )
+if ( strcmp(dim, '2D') == 1 || strcmp(dim, 'sphere') == 1 )
     yy = trigpts(N, dom(3:4));
     [xx, yy] = meshgrid(xx, yy);
-elseif ( dim == 3 )
+elseif ( strcmp(dim, '3D') == 1 )
     yy = trigpts(N, dom(3:4));
     zz = trigpts(N, dom(5:6));
     [xx, yy, zz] = meshgrid(xx, yy, zz);
 end
 vInit = [];
 for k = 1:nVars
-    if ( dim == 1 )
+    if ( strcmp(dim, '1D') == 1 )
         vInit = [vInit; feval(u0{k}, xx)]; %#ok<*AGROW>
-    elseif ( dim == 2 )
+    elseif ( strcmp(dim, '2D') == 1 || strcmp(dim, 'sphere') == 1 )
         vInit = [vInit; feval(u0{k}, xx, yy)];
-    elseif ( dim == 3 )
+    elseif ( strcmp(dim, '3D') == 1 )
         vInit = [vInit; feval(u0{k}, xx, yy, zz)];
     end
 end

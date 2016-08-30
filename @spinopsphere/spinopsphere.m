@@ -4,6 +4,36 @@ classdef spinopsphere < spinoperator
 %   SPINOPSPHERE is a class for representing the spatial part S of a time-
 %   dependent PDE of the form u_t = S(u) = Lu + N(u) on the unit sphere, where 
 %   L is a linear operator and N is a nonlinear operator. 
+%
+%   S = SPINOPSPHERE(PDECHAR) creates a SPINOPSPHERE object S defined by the 
+%   string PDECHAR. Strings available include 'AC2sphere' for Allen-Cahn 
+%   equation and 'GL2' for Ginzburg-Landau equation.
+%
+%   S = SPINOPSPHERE(DOM, TSPAN) creates a SPINOPSPHERE object S on DOM x TSPAN. 
+%   The other fields of a SPINOPSPHERE are its linear part S.LINEARPART, its 
+%   nonlienar part S.NONLINEARPART and the initial condition S.INIT. The fields 
+%   can be set via S.PROP = VALUE. See Remark 1 and Example 1.
+%
+% Remark 1: The linear part has to be of the form 
+%           
+%               @(u) A*lap(u)  
+%
+%           for some number A.
+%
+% Remark 2: The nonlinear part has to be of the form @(u) f(u), where f is a 
+%           nonlinear function of u that does not involve any derivatives of u.
+%
+% Example 1: To construct a SPINOPSPHERE corresponding to the GL2 equation on 
+%            with TSPAN = [0 10] and initial condition the spherical harmonic
+%            (2,1), one can type:
+%
+%            tspan = [0 10];
+%            S = spinopsphere(tspan);
+%            S.linearPart = @(u) lap(u);
+%            S.nonlinearPart = @(u) u - (1+1.3i)*u.*(abs(u).^2);
+%            S.init = spherefun.sphharm(2,1);
+%
+% See also SPINOPERATOR, SPINSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.

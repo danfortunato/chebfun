@@ -33,7 +33,7 @@ classdef spinop3 < spinoperator
 %            S.nonlinearPart = @(u) u - (1+1.3i)*u.*(abs(u).^2);
 %            S.init = chebfun3(.1*randn(32,32,32), dom);
 %
-% See also SPINOPERATOR, SPINOP, SPINOP2, SPIN3.
+% See also SPINOPERATOR, SPIN3.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.
