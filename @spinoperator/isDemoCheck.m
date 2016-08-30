@@ -8,14 +8,17 @@ function out = isDemoCheck(char)
 % this with a more *cosmic* solution.
 out = [];
 try spinop(char);
-catch 
+catch
     try spinop2(char);
-    catch 
+    catch
         try spinop3(char);
-        catch 
-            % It's not a demo because SPINOP/SPINOP2/SPINOP3 didn't recognise
-            % it:
-            out = 0;
+        catch
+            try spinopsphere(char);
+            catch
+                % It's not a demo because SPINOP/SPINOP2/SPINOP2S/SPINOP3 didn't 
+                % recognise it:
+                out = 0;
+            end
         end
     end
 end

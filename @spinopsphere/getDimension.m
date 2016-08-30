@@ -1,11 +1,11 @@
 function dim = getDimension(S)
-%GETDIMENSION   Returns '2D' for a SPINOP2.
+%GETDIMENSION   Returns 'sphere' for a SPINOPSPHERE.
 %
-% See also SPINOP2.
+% See also SPINOPSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.
 
-dim = '2D';
+dim = 'sphere';
     
 end

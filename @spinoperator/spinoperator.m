@@ -3,10 +3,10 @@ classdef spinoperator
 %operators for time-dependent PDEs. 
 %   SPINOPERATOR is a class for representing the spartial part S of a 
 %   time-dependent PDE of the form u_t = S(u) = Lu + N(u), where L is a linear 
-%   operator and N is a nonlinear operator. SPINOP (in 1D), SPINOP2 (in 2D) and 
-%   SPINOP3 (in 3D) are full implementations.
+%   operator and N is a nonlinear operator. SPINOP (in 1D), SPINOP2 (in 2D), 
+%   SPINOP2S (on the sphere) and SPINOP3 (in 3D) are full implementations.
 %   
-% See also SPINOP, SPINOP2, SPINOP3.
+% See also SPINOP, SPINOP2, SPINOP3, SPINSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.
@@ -15,10 +15,11 @@ classdef spinoperator
     %% CLASS PROPERTIES:
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     properties ( Access = public )
-        domain              % Spatial domain (1x2 DOUBLE in 1D, 1x4 in 2D, 
-                            % 1x6 in 3D)
+        domain              % Spatial domain (1x2 DOUBLE in 1D, 1x4 in 2D and on
+                            % the sphere, 1x6 in 3D)
         init                % Initial condition (CHEBFUN in 1D, CHEBFUN2 in 2D,
-                            % CHEBFUN3 in 3D, CHEBMATRIX for systems)
+                            % SPHEREFUN on the sphere, CHEBFUN3 in 3D and 
+                            % CHEBMATRIX for systems)
         linearPart          % Linear part of the operator (FUNCTION HANDLE)
         nonlinearPart       % Nonlinear part of the operator (FUNCTION HANDLE)
         tspan               % Vector of strictly increasing time 
@@ -52,7 +53,9 @@ classdef spinoperator
         
         % METHOD for nonlinearPartCoeffs:
         function Nc = get.nonlinearPartCoeffs(S)
-            
+        %GETNONLINEARPARTCOEFFS   Extract the differentiated part of the
+        %nonlinear operator, which will be evaluated in coefficient space.
+        
             % Extract the nonlinear part:
             N = S.nonlinearPart;
             
@@ -84,7 +87,7 @@ classdef spinoperator
             
             % For scalar equations in 1D, we support nonlinearities of the form
             % diff(f(u),m) with m>=0:
-            if ( dim == 1 && nVars == 1 )
+            if ( strcmp(dim, '1D') == 1 && nVars == 1 )
                 
                 % Compute the differentiation order to get NC=diff(u,m):
                 diffOrderTwoOrGreater = regexp(strN, ',\d*', 'match');
@@ -99,9 +102,10 @@ classdef spinoperator
                 Nc = ['@(u) diff(u,', diffOrder, ')'];
                 Nc = eval(Nc);
                 
-            % For scalar equations in 2D and 3D, and for systems of equations in 
-            % 1D, 2D and 3D, we only support nonlinearities of the form 
-            % f_i(u_1,...,u_n), i.e., with no differentiation, so Nc=1:
+            % For scalar equations in 2D/3D and on the sphere, and for system
+            % of equations in 1D/2D/3D and on the sphere, we only support 
+            % nonlinearities of the form f_i(u_1,...,u_n), i.e., with no 
+            % differentiation, so Nc=1:
             else
                 
                 % Nc=1:
@@ -113,7 +117,9 @@ classdef spinoperator
         
         % METHOD for nonlinearPartVals:
         function Nv = get.nonlinearPartVals(S)
-            
+        %GETNONLINEARPARTVALS   Extract the nondifferentiated part of the
+        %nonlinear operator, which will be evaluated in value space.
+        
             % Extract the nonlinear part:
             N = S.nonlinearPart;
             
@@ -146,7 +152,7 @@ classdef spinoperator
             
             % For scalar equations in 1D, we support nonlinearities of the form
             % diff(f(u),m) with m>=0:
-            if ( dim == 1 && nVars == 1 )
+            if ( strcmp(dim, '1D') == 1 && nVars == 1 )
                 
                 % Get rid of the differentiation part in STRN to get NV=f(u):
                 oldString = {'diff', ',\d*)'};
@@ -154,9 +160,10 @@ classdef spinoperator
                 Nv = regexprep(strN, oldString, newString);
                 Nv = eval(Nv);
                 
-            % For scalar equations in 2D and 3D, and for systems of equations in 
-            % 1D, 2D and 3D, we only support nonlinearities of the form 
-            % f_i(u_1,...,u_n), i.e., with no differentiation, so Nv=N:
+            % For scalar equations in 2D/3D and on the sphere, and for systems 
+            % of equations in 1D/2D/3D and on the sphere, we only support 
+            % nonlinearities of the form f_i(u_1,...,u_n), i.e., with no 
+            % differentiation, so Nv=N:
             else
                 
                 % Nv=N:
@@ -183,7 +190,7 @@ classdef spinoperator
                 end
                 Nv = ['@(u)', strNvNew];
                 Nv = eval(Nv);
-                
+ 
             end
         end
         

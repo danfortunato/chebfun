@@ -1,9 +1,10 @@
 function [uOut, tOut] = solvepde(varargin)
-%SOLVEPDE   Solve a PDE defined by a SPINOP, a SPINOP2 or a SPINOP3.
-%   SOLVEPDE is called by SPIN, SPIN2 and SPIN3. It is not called directly by
-%   the user. Appropriate help texts can be found in SPIN, SPIN2 and SPIN3.
+%SOLVEPDE   Solve a PDE defined by a SPINOPERATOR.
+%   SOLVEPDE is called by SPIN, SPIN2, SPIN3 and SPINSPHERE. It is not called 
+%   directly by the user. Appropriate help texts can be found in SPIN, SPIN2,
+%   SPIN3 and SPINSPHERE.
 %
-% See also SPIN, SPIN2, SPIN3.
+% See also SPIN, SPIN2, SPIN3, SPINSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.
@@ -37,9 +38,10 @@ while ( j <= nargin )
     elseif ( isa(item, 'double') == 1 ) 
         tspan = item;
     elseif ( isa(item, 'chebfun') == 1 || isa(item, 'chebfun2') == 1 || ...
-        isa(item, 'chebfun3') == 1 )
+        isa(item, 'chebfun3') == 1 || isa(item, 'spherefun') == 1 )
         u0 = chebmatrix(item);
-    elseif ( isa(item, 'chebfun2v') == 1 || isa(item, 'chebfun3v') == 1 )
+    elseif ( isa(item, 'chebfun2v') == 1 || isa(item, 'chebfun3v') == 1 || ...
+        isa(item, 'spherefunv') == 1 )
         u0 = chebmatrix(item(1));
         for k = 2:size(item, 1)
             u0(k,1) = item(k);
@@ -62,12 +64,14 @@ if ( isempty(S) == 0 )
     
     % Create a SPINPREFERENCE object if none:
     if ( isempty(pref) == 1 )
-        if ( dim == 1 )
+        if ( strcmp(dim, '1D') == 1 )
             pref = spinpref();
-        elseif ( dim == 2 )
+        elseif ( strcmp(dim, '2D') == 1 )
             pref = spinpref2();
-        elseif ( dim == 3 )
+        elseif ( strcmp(dim, '3D') == 1 )
             pref = spinpref3();
+        elseif ( strcmp(dim, 'sphere') == 1 )
+            pref = spinprefsphere();
         end
     end
     
@@ -75,39 +79,49 @@ if ( isempty(S) == 0 )
 else
     
     % Create a SPINOPERATOR:
-    is2D = ~isempty(strfind(pdechar, '2'));
-    is3D = ~isempty(strfind(pdechar, '3'));
-    is1D = ( is2D == 0 && is3D == 0 );
+    is2D = ~isempty(strfind(item, '2'));
+    is3D = ~isempty(strfind(item, '3'));
+    isSphere = ~isempty(strfind(item, 'sphere'));
+    is1D = ~is2D && ~is3D && ~isSphere;
     if ( is1D == 1 )
-        dim = 1;
+        dim = '1D';
         S = spinop(pdechar);
     elseif ( is2D == 1 )
-        dim = 2;
+        dim = '2D';
         S = spinop2(pdechar);
     elseif ( is3D == 1 )
-        dim = 3;
+        dim = '3D';
         S = spinop3(pdechar);
+    elseif ( isSphere == 1 )
+        dim = 'sphere';
+        S = spinopsphere(pdechar);
     end
     
     % Create a SPINPREFERENCE object if none:
     if ( isempty(pref) == 1 )
-        if ( dim == 1 )
+        if ( strcmp(dim, '1D') == 1 )
             if ( isempty(tspan) == 1 )
                 pref = spinpref(pdechar);
             else
                 pref = spinpref();
             end
-        elseif ( dim == 2 )
+        elseif ( strcmp(dim, '2D') == 1 )
             if ( isempty(tspan) == 1 )
                 pref = spinpref2(pdechar);
             else
                 pref = spinpref2();
             end
-        elseif ( dim == 3 )
+        elseif ( strcmp(dim, '3D') == 1 )
             if ( isempty(tspan) == 1 )
                 pref = spinpref3(pdechar);
             else
                 pref = spinpref3();
+            end
+        elseif ( strcmp(dim, 'sphere') == 1 )
+            if ( isempty(tspan) == 1 )
+                pref = spinprefsphere(pdechar);
+            else
+                pref = spinprefsphere();
             end
         end
     end
@@ -122,9 +136,10 @@ end
 if ( isempty(u0) == 1 )
     u0 = S.init;
     if ( isa(u0, 'chebfun') == 1 || isa(u0, 'chebfun2') == 1 || ...
-        isa(u0, 'chebfun3') == 1 )
+        isa(u0, 'chebfun3') == 1 || isa(u0, 'spherefun') == 1 )
         u0 = chebmatrix(u0);
-    elseif ( isa(u0, 'chebfun2v') == 1 || isa(u0, 'chebfun3v') == 1 )
+    elseif ( isa(u0, 'chebfun2v') == 1 || isa(u0, 'chebfun3v') == 1 || ...
+        isa(u0, 'spherefunv') == 1)
         temp = chebmatrix(u0(1));
         for k = 2:size(u0, 1)
             temp(k,1) = u0(k);
@@ -133,17 +148,20 @@ if ( isempty(u0) == 1 )
     end
 end
 
-% Convert to trigfun:
+% Convert to TRIGFUN: note that SPHEREFUN's are always based on TRIGFUN's, so no 
+% need to enforce this when solving a PDE on the sphere.
 nVars = S.numVars;
 for k = 1:nVars
-    if ( dim == 1 )
+    if ( strcmp(dim, '1D') == 1 )
         temp = chebfun(u0{k}, 'trig');
-    elseif ( dim == 2 )
+        u0(k,1) = temp;
+    elseif ( strcmp(dim, '2D') == 1 )
         temp = chebfun2(u0{k}, 'trig');
-    elseif ( dim == 3 )
+        u0(k,1) = temp;
+    elseif ( strcmp(dim, '3D') == 1 )
         temp = chebfun3(u0{k}, 'trig');
+        u0(k,1) = temp;
     end
-    u0(k,1) = temp;
 end
 
 % Space interval DOM and final time TF:
@@ -153,6 +171,9 @@ tf = tspan(end);
 % Throw an error if the domains of the initial condition and the SPINOPERATOR
 % are different:
 if ( isempty(S) == 0 )
+    if ( strcmp(dim, 'sphere') == 1 )
+        S.domain = [-pi, pi, 0, pi];
+    end
     if ( isequal(S.domain, dom) == 0 )
         error('SPINOPERATOR:solvepde', ['The initial condition and the ', ...
             'operator do not live on the same domain.'])

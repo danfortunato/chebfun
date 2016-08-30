@@ -86,7 +86,7 @@ function [uout, tout] = spin3(varargin)
 %
 %    on [0 20]^3 from t=0 to t=200,  with a random initial condition.
 %
-% See also SPINOP3, SPINPREF3, SPINSCHEME, SPIN, SPIN2.
+% See also SPINOP3, SPINPREF3, SPINSCHEME, SPIN, SPIN2, SPINSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.
@@ -110,16 +110,21 @@ while ( j <= nargin )
         end
     elseif ( isa(item, 'char') == 1 )        
         isDemo = spinoperator.isDemoCheck(item);
-        % This is a char for a demo, e.g., 'gs3' or 'gl3':
+        % This is a char for a demo, e.g., 'GS3' or 'GL3':
         if ( isDemo == 1 )
-            is1D = isempty(strfind(item, '2')) && isempty(strfind(item, '3'));
             is2D = ~isempty(strfind(item, '2'));
+            is3D = ~isempty(strfind(item, '3'));
+            isSphere = ~isempty(strfind(item, 'sphere'));
+            is1D = ~is2D && ~is3D && ~isSphere;
             if ( is1D == 1 )
                 error('CHEBFUN:SPIN3', ['Use SPIN for PDEs in one space ', ...
                     'dimension.'])
             elseif ( is2D == 1 )
                 error('CHEBFUN:SPIN3', ['Use SPIN2 for PDEs in two space ', ...
                     'dimensions.'])
+            elseif ( isSphere == 1 )
+                error('CHEBFUN:SPIN3', ['Use SPINSPHERE for PDEs on ', ...
+                    'the sphere.'])
             end
         % This is a preference, e.g., 'N' or 'dt':
         else

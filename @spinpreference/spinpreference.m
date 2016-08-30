@@ -3,10 +3,10 @@ classdef spinpreference
 %SPIN3.
 %   SPINPREFERENCE is an abstract class for managing preferences when solving 
 %   a time-dependent PDE defined by a SPINOPERATOR. SPINPREF (for SPIN in 1D), 
-%   SPINPREF2 (for SPIN2 in 2D) and SPINPREF3 (for SPIN3 in 3D) are full 
-%   implementations.
+%   SPINPREF2 (for SPIN2 in 2D), SPINPREFSPHERE (for SPINSPHERE on the sphere)
+%   and SPINPREF3 (for SPIN3 in 3D) are full implementations.
 %
-% See also SPINPREF, SPINPREF2, SPINPREF3.
+% See also SPINPREF, SPINPREF2, SPINPREF3, SPINPREFSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.

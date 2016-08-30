@@ -1,5 +1,6 @@
-classdef spinpref2 < spinpreference
-%SPINPREF2   Class for managing preferences when solving a 2D PDE with SPIN2.
+classdef spinprefsphere < spinpreference
+%SPINPREFSPHERE   Class for managing preferences when solving a PDE on the unit 
+%sphere with SPINSPHERE.
 %
 % Available preferences ([] = defaults):
 %
@@ -61,17 +62,19 @@ classdef spinpref2 < spinpreference
 %
 % Construction:
 %
-%   PREF = SPINPREF2() creates a SPINPREF2 object with the default values.
+%   PREF = SPINPREF2SPHERE() creates a SPINPREF2S object with the default
+%   values.
 %
-%   PREF = SPINPREF2(PDECHAR) creates a SPINPREF2 object corresponding to the 
-%   preferences used for the SPIN2(PDECHAR) demo. Strings available include
-%   'GL2' for Ginzburg-Landau equation and 'GS2' for Gray-Scott equations. 
-%   Other PDEs are available, see HELP/SPIN2.
+%   PREF = SPINPREFSPHERE(PDECHAR) creates a SPINPREF2S object corresponding to
+%   the preferences used for the SPINSPHERE(PDECHAR) demo. Strings available
+%   include 'ACsphere' for Allen-Cahn equation and 'GLsphere' for Ginzburg-
+%   Landau equation. 
 %
-%   PREF = SPINPREF2(PROP1, VALUE1, PROP2, VALUE2, ...) creates a SPINPREF2 
-%   object with the properties PROP1 and PROP2 set to VALUE1 and VALUE2.
+%   PREF = SPINPREFSPHERE(PROP1, VALUE1, PROP2, VALUE2, ...) creates a 
+%   SPINPREFSPHERE object with the properties PROP1 and PROP2 set to VALUE1 and
+%   VALUE2.
 %
-% See also SPIN2.
+% See also SPINSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.
@@ -89,7 +92,7 @@ classdef spinpref2 < spinpreference
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     methods ( Access = public, Static = false )
         
-        function pref = spinpref2(varargin) 
+        function pref = spinprefsphere(varargin) 
             if ( nargin == 0 )
                 pref.dataToPlot = 'real';
                 pref.dealias = 'off';
@@ -117,27 +120,19 @@ classdef spinpref2 < spinpreference
                 pref.Nplot = 256;
                 pref.plot = 'movie';
                 pref.scheme = 'etdrk4';
-                if ( strcmpi(pdechar, 'GL2') == 1 )
+                if ( strcmpi(pdechar, 'ACsphere') == 1 )
                     pref.dt = 2e-1;
                     pref.iterPlot = 1;
                     pref.N = 64;
-                elseif ( strcmpi(pdechar, 'GS2') == 1 )
-                    pref.dt = 4;
-                    pref.iterPlot = 8;
-                    pref.N = 64;
-                elseif ( strcmpi(pdechar, 'Schnak2') == 1 )
-                    pref.dt = 5e-1;
-                    pref.iterPlot = 10;
-                    pref.N = 64;
-                elseif ( strcmpi(pdechar, 'SH2') == 1 )
-                    pref.dt = 1;
+                elseif ( strcmpi(pdechar, 'GLsphere') == 1 )
+                    pref.dt = 2e-1;
                     pref.iterPlot = 1;
-                    pref.N = 64; 
+                    pref.N = 64;
                 else
-                    error('SPINPREF2:CONSTRUCTOR', 'Unrecognized PDE.')
+                    error('SPINPREFSPEHRE:CONSTRUCTOR', 'Unrecognized PDE.')
                 end
             else
-                pref = spinpref2();
+                pref = spinprefsphere();
                 for k = 1:nargin/2
                     pref.(varargin{2*(k-1)+1}) = varargin{2*k};
                 end

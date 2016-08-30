@@ -192,7 +192,7 @@ function [uout, tout] = spin(varargin)
 %   solves the KdV equation using a time-step dt=1e-5, N=256 grid points and 
 %   produces a WATERFALL plot as opposed to a movie.
 %
-% See also SPINOP, SPINPREF, SPINSCHEME, SPIN2, SPIN3.
+% See also SPINOP, SPINPREF, SPINSCHEME, SPIN2, SPIN3, SPINSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.
@@ -210,13 +210,17 @@ while ( j <= nargin )
         end
     elseif ( isa(item, 'char') == 1 )        
         isDemo = spinoperator.isDemoCheck(item);
-        % This is a char for a demo, e.g., 'ks' or 'kdv':
+        % This is a char for a demo, e.g., 'KS' or 'KdV':
         if ( isDemo == 1 )
             is2D = ~isempty(strfind(item, '2'));
             is3D = ~isempty(strfind(item, '3'));
+            isSphere = ~isempty(strfind(item, 'sphere'));
             if ( is2D == 1 )
                 error('CHEBFUN:SPIN', ['Use SPIN2 for PDEs in two space ', ...
                     'dimensions.'])
+            elseif ( isSphere == 1 )
+                    error('CHEBFUN:SPIN', ['Use SPINSPHERE for PDEs on ', ...
+                    'the sphere.'])
             elseif ( is3D == 1 )
                 error('CHEBFUN:SPIN', ['Use SPIN3 for PDEs in three space ', ...
                     'dimensions.'])

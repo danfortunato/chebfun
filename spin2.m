@@ -24,7 +24,7 @@ function [uout, tout] = spin2(varargin)
 %   of the solution as it computes it. See HELP/SPINOP2.
 %
 %   UOUT = SPIN2(..., PREF) allows one to use the preferences specified by the 
-%   SPINPREF object PREF. See HELP/SPINPREF2.
+%   SPINPREF2 object PREF. See HELP/SPINPREF2.
 % 
 %   [UOUT, TOUT] = SPIN2(...) also returns the times chunks TOUT at which UOUT
 %   was computed.
@@ -86,7 +86,7 @@ function [uout, tout] = spin2(varargin)
 %
 %    on [0 20]^2 from t=0 to t=200, with a random initial condition.
 %
-% See also SPINOP2, SPINPREF2, SPINSCHEME, SPIN, SPIN3.
+% See also SPINOP2, SPINPREF2, SPINSCHEME, SPIN, SPIN3, SPINSPHERE.
 
 % Copyright 2016 by The University of Oxford and The Chebfun Developers.
 % See http://www.chebfun.org/ for Chebfun information.
@@ -104,13 +104,18 @@ while ( j <= nargin )
         end
     elseif ( isa(item, 'char') == 1 )        
         isDemo = spinoperator.isDemoCheck(item);
-        % This is a char for a demo, e.g., 'gs2' or 'gl2':
+        % This is a char for a demo, e.g., 'GS2' or 'GL2':
         if ( isDemo == 1 )
-            is1D = isempty(strfind(item, '2')) && isempty(strfind(item, '3'));
+            is2D = ~isempty(strfind(item, '2'));
             is3D = ~isempty(strfind(item, '3'));
+            isSphere = ~isempty(strfind(item, 'sphere'));
+            is1D = ~is2D && ~is3D && ~isSphere;
             if ( is1D == 1 )
                 error('CHEBFUN:SPIN2', ['Use SPIN for PDEs in one space ', ...
                     'dimension.'])
+            elseif ( isSphere == 1 )
+                error('CHEBFUN:SPIN2', ['Use SPINSPHERE for PDEs on ', ...
+                    'the sphere.'])
             elseif ( is3D == 1 )
                 error('CHEBFUN:SPIN2', ['Use SPIN3 for PDEs in three space ', ...
                     'dimensions.'])
