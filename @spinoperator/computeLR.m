@@ -9,9 +9,12 @@ function LR = computeLR(S, dt, L, M)
 % See http://www.chebfun.org/ for Chebfun information.
 
 % Set-up:
-dim = getDimension(S); % spatial dimension (1, 2 or 3)
+dim = getDimension(S); % spatial dimension ('1D', '2D' or '3D')
 nVars = S.numVars;     % number of unknown functions
 N = size(L, 1)/nVars;  % grid points
+
+% Convert DIM to a number:
+dim = str2double(dim(1));
 
 % Roots of unity:
 if ( isreal(L) == 1 )

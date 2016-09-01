@@ -221,6 +221,19 @@ classdef spinoperator
         grid = reshapeGrid(S, grid)
 
     end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% ABSTRACT AND STATIC METHODS:
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    methods ( Access = public, Abstract = true, Static = true )
+        
+        % Returns the values to coefficients transform:
+        f = getVals2CoeffsTransform
+        
+         % Returns the coefficients to values transform:
+        f = getCoeffs2ValsTransform
+
+    end
    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% CONCRETE AND STATIC METHODS:

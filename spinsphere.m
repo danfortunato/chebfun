@@ -2,7 +2,7 @@ function [uout, tout] = spinsphere(varargin)
 %SPINSPHERE  Solve a time-dependent PDE on the unit sphere, using a Fourier
 %spectral method and an exponential integrator time-stepping scheme.
 %
-%   UOUT = SPIN2SPHERE(PDECHAR) solves the PDE specified by the string PDECHAR, 
+%   UOUT = SPINSPHERE(PDECHAR) solves the PDE specified by the string PDECHAR, 
 %   and plots a movie of the solution as it computes it. The space and time 
 %   intervals and the initial condition are chosen to produce beautiful movies. 
 %   Strings available include include 'AC2s' for Allen-Cahn equation and 'GL2s' 

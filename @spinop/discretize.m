@@ -40,6 +40,10 @@ strL = func2str(funcL);
 strL = strrep(strL, '@(', '@(x,');
 funcL = eval(strL);
 
+% Get the chebop pref and set it to use TRIGSPEC:
+pref = cheboppref();
+pref.discretization = @trigspec;
+
 % USE CHEBOP, LINOP and MATRIX with TRIGSPEC discretization:
 matL = matrix(linop(chebop(funcL, dom)), N, pref);
 L = [];

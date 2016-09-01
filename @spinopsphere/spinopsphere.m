@@ -75,6 +75,19 @@ classdef spinopsphere < spinoperator
         
     end
 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% CONCRETE AND STATIC METHODS:
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    methods ( Access = public, Abstract = false, Static = true )
+        
+        % Get the values to coefficients transform on the sphere:
+        f = getVals2CoeffsTransform
+        
+        % Get the coefficients to values transform on the sphere:
+        f = getCoeffs2ValsTransform
+   
+    end
+    
 end
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    

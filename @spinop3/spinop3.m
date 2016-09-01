@@ -90,6 +90,19 @@ classdef spinop3 < spinoperator
         
     end
     
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% CONCRETE AND STATIC METHODS:
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    methods ( Access = public, Abstract = false, Static = true )
+        
+        % Returns the FFTN in 3D:
+        f = getVals2CoeffsTransform
+        
+        % Returns the IFFTN in 3D:
+        f = getCoeffs2ValsTransform
+   
+    end
+    
 end
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    

@@ -237,8 +237,7 @@ q = K.steps;
 [L, Nc] = discretize(S, N);
 Nv = S.nonlinearPartVals;
 
-% Set-up spatial grid, and initial condition (values VINIT and Fourier coeffs 
-% CINIT):
+% Set-up spatial grid:
 xx = trigpts(N, dom(1:2));
 if ( strcmp(dim, '2D') == 1 || strcmp(dim, 'sphere') == 1 )
     yy = trigpts(N, dom(3:4));
@@ -248,6 +247,8 @@ elseif ( strcmp(dim, '3D') == 1 )
     zz = trigpts(N, dom(5:6));
     [xx, yy, zz] = meshgrid(xx, yy, zz);
 end
+
+% Evaluate the initial condition on the grid: 
 vInit = [];
 for k = 1:nVars
     if ( strcmp(dim, '1D') == 1 )
@@ -258,36 +259,41 @@ for k = 1:nVars
         vInit = [vInit; feval(u0{k}, xx, yy, zz)];
     end
 end
+
+% Get the appropriate values to coeffs and coeffs to values transform:
+coeffs2vals = S.getCoeffs2ValsTransform;
+vals2coeffs = S.getVals2CoeffsTransform;
+
+% Transform to coefficients:
 cInit{1} = [];
 for k = 1:nVars
     idx = (k-1)*N + 1;
-    cInit{1} = [cInit{1}; fftn(vInit(idx:idx+N-1,:,:))];
+    cInit{1} = [cInit{1}; vals2coeffs(vInit(idx:idx+N-1,:,:))];
 end
 
-% Store the nonlinear evaluation of the initial data in NCINIT:
-vals = ifftn(cInit{1}(1:N,:,:));
+% Nonlinear evaluation of the initial condition:
+vals = Nv(vInit);
+
+% Transform to coefficients:
+coeffs = vals2coeffs(vals(1:N,:,:));
 for k = 1:nVars-1
     idx = k*N + 1;
-    vals = [vals; ifftn(cInit{1}(idx:idx+N-1,:,:))];
+    coeffs = [coeffs; vals2coeffs(vals(idx:idx+N-1,:,:))];
 end
-vals = Nv(vals);
-coeffs = fftn(vals(1:N,:,:));
-for k = 1:nVars-1
-    idx = k*N + 1;
-    coeffs = [coeffs; fftn(vals(idx:idx+N-1,:,:))];
-end
-coeffs = Nc.*coeffs;
+% [TODO]: If we allow one day SPINOPSPHERE to have differentiation in their
+% nonlinear parts, this .* should be a * for SPINSPHERE:
+coeffs = Nc.*coeffs; 
 NcInit{1} = coeffs;
     
 % Get enough initial data when using a multistep scheme:
 if ( q > 1 )
     [cInit, NcInit, dt] = startMultistep(K, adaptiveTime, dt, L, Nc, Nv, ...
         pref, S, cInit, NcInit);
-end
-vInit = ifftn(cInit{1}(1:N,:,:));
-for k = 1:nVars-1
-    idx = k*N + 1;
-    vInit = [vInit; ifftn(cInit{1}(idx:idx+N-1,:,:))];
+    vInit = coeffs2vals(cInit{1}(1:N,:,:));
+    for k = 1:nVars-1
+        idx = k*N + 1;
+        vInit = [vInit; coeffs2vals(cInit{1}(idx:idx+N-1,:,:))];
+    end
 end
 
 % Compute the coefficients of the scheme:
@@ -300,13 +306,13 @@ end
 
 % Indexes for dealiasing:
 toOne = floor(N/2) + 1 - ceil(N/6):floor(N/2) + ceil(N/6);
-if ( dim == 1 ) 
+if ( strcmp(dim, '1D') == 1 ) 
     ind = false(N, 1);
     ind(toOne) = 1;
-elseif ( dim == 2 )
+elseif ( strcmp(dim, '2D') == 1 || strcmp(dim, 'sphere') == 1 )
     ind = false(N, N);
     ind(toOne, toOne) = 1;
-elseif ( dim == 3 )
+elseif ( strcmp(dim, '3D') == 1 )
     ind = false(N, N, N);
     ind(toOne, toOne, toOne) = 1;
 end
@@ -325,16 +331,16 @@ end
 % Create grids for plotting, and plot initial condition if using MOVIE:
 if ( strcmpi(plotStyle, 'movie') == 1 )
     Nplot = max(N, pref.Nplot);
-    if ( dim == 1 )
+    if ( strcmp(dim, '1D') == 1 )
         dataGrid = {xx};
         plotGrid = {trigpts(Nplot, dom)};
-    elseif ( dim == 2 )
+    elseif ( strcmp(dim, '2D') == 1 )
         dataGrid = {xx; yy};
         ttx = trigpts(Nplot, dom(1:2));
         tty = trigpts(Nplot, dom(3:4));
         [xxx, yyy] = meshgrid(ttx, tty);
         plotGrid = {xxx; yyy};
-    elseif ( dim == 3 );
+    elseif ( strcmp(dim, '3D') == 1 );
         dataGrid = {xx; yy; zz};
         ttx = trigpts(Nplot, dom(1:2));
         tty = trigpts(Nplot, dom(3:4));
@@ -421,16 +427,16 @@ while ( t < tf )
                 v = [];
                 for k = 1:nVars
                     idx = (k-1)*N + 1;
-                    temp = ifftn(cOld{1}(idx:idx+N-1,:,:));
+                    temp = coeffs2vals(cOld{1}(idx:idx+N-1,:,:));
                     if ( max(abs(imag(temp(:)))) < errTol )
                         temp = real(temp);
                     end
                     v = [v; temp];
                 end
                 valuesUpdated = 1;
-                if ( dim == 1 )
+                if ( strcmp(dim, '1D') == 1 )
                     isLimGiven = ~isempty(pref.Ylim);
-                elseif ( dim == 2 || dim == 3 ) 
+                elseif ( strcmp(dim, '2D') == 1 || strcmp(dim, '3D') == 1 ) 
                     isLimGiven = ~isempty(pref.Clim);
                 end
                 if ( isLimGiven == 1 )
@@ -447,7 +453,7 @@ while ( t < tf )
                 v = [];
                 for k = 1:nVars
                     idx = (k-1)*N + 1;
-                    temp = ifft(cOld{1}(idx:idx+N-1));
+                    temp = coeffs2vals(cOld{1}(idx:idx+N-1));
                     if ( max(abs(imag(temp(:)))) < errTol )
                         temp = real(temp);
                     end
@@ -464,7 +470,7 @@ while ( t < tf )
                     v = [];
                     for k = 1:nVars
                         idx = (k-1)*N + 1;
-                        temp = ifftn(cOld{1}(idx:idx+N-1,:,:));
+                        temp = coeffs2vals(cOld{1}(idx:idx+N-1,:,:));
                         if ( max(abs(imag(temp(:)))) < errTol )
                             temp = real(temp);
                         end
@@ -528,11 +534,11 @@ while ( t < tf )
     else
         
         % Increase N:
-        if ( dim == 1 )
+        if ( strcmp(dim, '1D') == 1 )
             NN = 2*N;
-        elseif ( dim == 2 )
+        elseif ( strcmp(dim, '2D') == 1 )
             NN = 1.5*N;
-        elseif ( dim == 3 )
+        elseif ( strcmp(dim, '3D') == 1 )
             NN = 1.25*N;
         end
         
@@ -545,18 +551,18 @@ while ( t < tf )
             vals = [];
             for k = 1:nVars
                 idx = (k-1)*N + 1;
-                valsOld = ifftn(cOld{i}(idx:idx+N-1,:,:));
-                if ( dim == 1 )
+                valsOld = coeffs2vals(cOld{i}(idx:idx+N-1,:,:));
+                if ( strcmp(dim, '1D') == 1 )
                     xx = trigpts(NN);
                     u = trigtech({valsOld, trigtech.vals2coeffs(valsOld)});
                     temp = feval(u, xx);
-                elseif ( dim == 2 )
+                elseif ( strcmp(dim, '2D') == 1 )
                     xx = trigpts(NN, dom(1:2));
                     yy = trigpts(NN, dom(3:4));
                     [xx, yy] = meshgrid(xx, yy);
                     u = chebfun2(valsOld, dom, 'trig');   
                     temp = feval(u, xx, yy);
-                elseif ( dim == 3 )
+                elseif ( strcmp(dim, '3D') == 1 )
                     xx = trigpts(NN, dom(1:2));
                     yy = trigpts(NN, dom(3:4));
                     zz = trigpts(NN, dom(5:6));
@@ -565,16 +571,16 @@ while ( t < tf )
                     temp = feval(u, xx, yy, zz);
                 end
                 vals = [vals; temp];
-                coeffs = [coeffs; fftn(temp)];
+                coeffs = [coeffs; vals2coeffs(temp)];
             end
             
             % Update the Fourier coefficients:
             cOld{i} = coeffs;
             vals = Nv(vals);
-            coeffs = fftn(vals(1:NN,:,:));
+            coeffs = vals2coeffs(vals(1:NN,:,:));
             for k = 1:nVars-1
                 idx = k*NN + 1;
-                coeffs = [coeffs; fftn(vals(idx:idx+NN-1,:,:))];
+                coeffs = [coeffs; vals2coeffs(vals(idx:idx+NN-1,:,:))];
             end
             
             % Update the nonlinear evaluations:
@@ -589,15 +595,15 @@ while ( t < tf )
         
         % Update the grid for plotting and the indexes for dealiasing:
         toOne = floor(N/2) + 1 - ceil(N/6):floor(N/2) + ceil(N/6);
-        if ( dim == 1 )
+        if ( strcmp(dim, '1D') == 1 )
             ind = false(N, 1);
             ind(toOne) = 1;
             dataGrid = {trigpts(N, dom(1:2))};
-        elseif ( dim == 2 )
+        elseif ( strcmp(dim, '2D') == 1 )
             ind = false(N, N);
             ind(toOne, toOne) = 1;  
             dataGrid = {xx; yy};
-        elseif ( dim == 3 );
+        elseif ( strcmp(dim, '3D') == 1 );
             ind = false(N, N, N);
             ind(toOne, toOne, toOne) = 1;              
             dataGrid = {xx; yy; zz};
@@ -642,11 +648,11 @@ if ( strcmpi(plotStyle, 'waterfall') == 1 )
 end
 
 % Get the right type of CHEBFUN:
-if ( dim == 1 )
+if ( strcmp(dim, '1D') == 1 )
     fun = @chebfun;
-elseif ( dim == 2 )
+elseif ( strcmp(dim, '2D') == 1 )
     fun = @chebfun2;
-elseif ( dim == 3 )
+elseif ( strcmp(dim, '3D') == 1 )
     fun = @chebfun3;
     
     % The data come from MESHGRID, need to permute them because the CHEBFUN3

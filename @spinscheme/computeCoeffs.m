@@ -21,6 +21,9 @@ nVars = S.numVars;     % number of unknown functions
 schemeName = K.scheme; % scheme
 N = size(L, 1)/nVars;  % grid points
 
+% Convert DIM to a number:
+dim = str2double(dim(1));
+
 % Coefficients of the scheme:
 A = cell(s);
 B = cell(s, 1);

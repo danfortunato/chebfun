@@ -41,20 +41,20 @@ D = trigspec.diffmat(N, 1);
 D2 = trigspec.diffmat(N, 2);
 
 % Fourier multiplication matrices:
-P = eye(m+1); 
-P = P(:, 1:m); 
+P = eye(N+1); 
+P = P(:, 1:N); 
 P(1,1) = .5; 
-P(m+1,1) = .5;
-Q = eye(m+1+5); 
-Q = Q(4:m+3,:); Q(1,4) = .5; 
-Q(1,m+4) = .5;
+P(N+1,1) = .5;
+Q = eye(N+1+5); 
+Q = Q(4:N+3,:); Q(1,4) = .5; 
+Q(1,N+4) = .5;
 sin2 = chebfun(@(x) sin(x).^2, [-pi, pi], 'trig');
-Msin2 = full(trigspec.multmat(m+1+5, sin2));
-Msin2 = Msin2(:, 4:m+4);
+Msin2 = full(trigspec.multmat(N+1+5, sin2));
+Msin2 = Msin2(:, 4:N+4);
 Msin2 = Q*Msin2*P;
 cossin = chebfun(@(x) cos(x).*sin(x), [-pi, pi], 'trig');
-Mcossin = full(trigspec.multmat(m+1+5, cossin));
-Mcossin = Mcossin(:, 4:m+4);
+Mcossin = full(trigspec.multmat(N+1+5, cossin));
+Mcossin = Mcossin(:, 4:N+4);
 Mcossin = Q*Mcossin*P;
 
 % Look for 'laplacian'/'lap':

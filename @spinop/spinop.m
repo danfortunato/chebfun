@@ -101,8 +101,21 @@ classdef spinop < spinoperator
         
     end
 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% CONCRETE AND STATIC METHODS:
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    methods ( Access = public, Abstract = false, Static = true )
+        
+        % Returns the FFT in 1D:
+        f = getVals2CoeffsTransform
+        
+        % Returns the IFFT in 1D:
+        f = getCoeffs2ValsTransform
+   
+    end
+    
 end
-
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     %% METHODS IMPLEMENTED IN THIS FILE:
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
